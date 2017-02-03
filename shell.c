@@ -58,23 +58,27 @@ char* getdir() {
 	} else return NULL;
 }
 
-int execute(char** varargs) {
+int executeprog(char** varargs) {
 	pid_t prog = fork();
 	int status;
 	if (prog < 0) {
 		perror("oh no");
 		return -1;
 	} else if (prog == 0) {
-		//question: if my execvp call fails and i end up running nothing or something
-		//in my cmds.c file, do i still need to kill the child process?
 		if (execvp(*varargs, varargs) < 0) {
-			printf("checking against other things\n");
-			return runcmd(*varargs, varargs);
+			perror("oh gosh");
+			exit(1);
 		}
 	} else {
 		while(waitpid(-1, &status, WUNTRACED) != prog);
-		printf("parent stopped waiting for his kid");
+//		printf("parent stopped waiting for his kid");
 		return 1;
+	}
+}
+
+int execute(char** varargs) {
+	if (runcmd(*varargs, varargs) == -2) {
+		return executeprog(varargs);
 	}
 }
 
