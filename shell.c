@@ -53,7 +53,6 @@ char** tokenize(char* werd) {
 char* getdir() {
 	char buff[1024];
 	char* retthis = getcwd(buff, 1024);
-	printf("WHAT: %s\n", retthis);
 	if (retthis != NULL) {
 		return retthis;
 	} else return NULL;
@@ -66,8 +65,11 @@ int execute(char** varargs) {
 		perror("oh no");
 		return -1;
 	} else if (prog == 0) {
+		//question: if my execvp call fails and i end up running nothing or something
+		//in my cmds.c file, do i still need to kill the child process?
 		if (execvp(*varargs, varargs) < 0) {
-			return executestagetwo(*varargs, varargs);
+			printf("checking against other things\n");
+			return runcmd(*varargs, varargs);
 		}
 	} else {
 		while(waitpid(-1, &status, WUNTRACED) != prog);
@@ -77,6 +79,7 @@ int execute(char** varargs) {
 }
 
 int main() {
+	printf("William's Shell!\n");
 	while (1) {
 		char* cwd = getdir();
 		printf("%s > ", cwd);
