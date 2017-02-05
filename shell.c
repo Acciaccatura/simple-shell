@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 
 #include "cmds.h"
 
@@ -32,6 +33,41 @@ char* readLine() {
 
 char** tokenize(char* werd) {
 	char** retthis = malloc(sizeof(char*)*MY_ALLOC);
+	int retsize = sizeof(char*)*MY_ALLOC;
+	int rettc = 0;
+	int werdc = 0;
+	bool inquotes = false;
+	bool isvaling = true;
+	retthis[rettc] = &(werd[werdc]);
+	rettc++;
+	while (werd[werdc] != '\0') {
+		if (werd[werdc] == ' ' && !inquotes) {
+			werd[werdc] = '\0';
+			isvaling = false;	
+		} else if (werd[werdc] == '\"'){
+			if (isvaling) {
+				isvaling = false;
+			}
+			werd[werdc] = '\0';
+			inquotes = !inquotes;
+		} else if (!isvaling){
+			isvaling = true;
+			if (rettc*sizeof(char*) > retsize) {
+				retsize *= 2;
+				retthis = realloc(retthis, retsize);
+			}
+			retthis[rettc] = &(werd[werdc]);
+			rettc++;
+	//		printf("%d IS RETTC!!!!!!!!!!!!!!!!!!!!\n", rettc);
+		}
+		werdc++;
+	}
+	for (int a = 0; a < rettc/sizeof(char*); a++) {
+		printf("%s, ", retthis[a]);
+	}
+	return retthis;
+	/*
+	char** retthis = malloc(sizeof(char*)*MY_ALLOC);
 	int alloc_mem = MY_ALLOC;
 	int counter = 0;
 	if (werd != NULL) {
@@ -48,6 +84,7 @@ char** tokenize(char* werd) {
 		}
 		return retthis;
 	} else return 0;
+	*/
 }
 
 char* getdir() {
@@ -88,7 +125,7 @@ int main() {
 		char* cwd = getdir();
 		printf("%s > ", cwd);
 		char* str = readLine();
-		printf("[%s]\n", str);
+//		printf("[%s]\n", str);
 		char** tokens = tokenize(str);
 		execute(tokens);
 		printf("\n");
