@@ -27,15 +27,15 @@ int runcmd(char* cmd, char* args[]) {
 			return (*commands[a])(args); 
 		}
 	}
-	return -2;		
+	return -1;		
 }
 
 int cd(char** args) {
 	int ret = chdir(args[1]);
 	if (ret == -1) {
-		printf("cd: Couldn't find path %s. We're sorry... we're sorry.", args[1]);
+		printf("cd: Couldn't find path %s.\n", args[1]);
 	}
-	return ret;
+	return 0;
 }
 
 int sysexit(char** args) {

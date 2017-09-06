@@ -103,7 +103,7 @@ int executeprog(char** varargs) {
 		return -1;
 	} else if (prog == 0) {
 		if (execvp(*varargs, varargs) < 0) {
-			perror("oh gosh");
+			perror(*varargs);
 			exit(1);
 		}
 	} else {
@@ -114,8 +114,11 @@ int executeprog(char** varargs) {
 }
 
 int execute(char** varargs) {
-	if (runcmd(*varargs, varargs) == -2) {
+	int cmd_res = runcmd(*varargs, varargs);
+	if (cmd_res == -1) {
 		return executeprog(varargs);
+	} else {
+		return cmd_res;
 	}
 }
 
@@ -128,7 +131,6 @@ int main() {
 //		printf("[%s]\n", str);
 		char** tokens = tokenize(str);
 		execute(tokens);
-		printf("\n");
 	}
 	return 0;
 }
